@@ -18,3 +18,9 @@ class SubCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = SubCategory
         fields = '__all__'
+
+
+class SliderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = ['id', 'image']

@@ -30,7 +30,7 @@ class Item(models.Model):
     is_sale = models.BooleanField(default=False)
     sale_price = models.FloatField(blank=True, null=True)
     color = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='media/images', null=True, blank=True)
+    image = models.ImageField(upload_to='images', null=True, blank=True)
     category = models.ForeignKey('SubCategory', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
