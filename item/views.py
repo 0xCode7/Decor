@@ -1,25 +1,39 @@
 import random
+from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Max
-from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
 from item.models import Category, Item, SubCategory
-from item.serailizers import ItemSerializer, CategorySerializer, SubCategorySerializer, SliderSerializer
+from item.serailizers import (CategorySerializer, ItemSerializer,
+                              SliderSerializer, SubCategorySerializer)
+from .filters import ItemFilter
+
+
+def get_filter_backends(self):
+    fb = super().get_filter_backends()
+    print("filter_backends type:", type(fb), fb)
+    return fb
 
 
 # Create your views here.
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all().order_by('id')
+    queryset = Category.objects.order_by('id')
     serializer_class = CategorySerializer
 
 
 class ItemViewSet(viewsets.ModelViewSet):
-    queryset = Item.objects.all().order_by('id')
+    queryset = Item.objects.order_by('pk')
     serializer_class = ItemSerializer
+    filterset_class = ItemFilter
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name']
+    ordering_fields = ['is_sale', 'price']
+    ordering = ['is_sale']
 
 
 class SubCategoryViewSet(viewsets.ModelViewSet):
-    queryset = SubCategory.objects.all().order_by('id')
+    queryset = SubCategory.objects.order_by('id')
     serializer_class = SubCategorySerializer
 
 

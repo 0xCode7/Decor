@@ -3,6 +3,11 @@ from rest_framework import serializers
 
 
 class ItemSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
+    )
+
     class Meta:
         model = Item
         fields = '__all__'
