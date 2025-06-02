@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-6tlo0*oy9_yl6w*!2jgfbr92&!4n3brjz#vm36frm9gvh!z=qq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'decor.up.railway.app']
 CSRF_COOKIE_SECURE = ['127.0.0.', 'https://decor.up.railway.app/']
@@ -40,7 +40,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
 
-    'item'
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+    'item',
+    'authentication'
 ]
 
 MIDDLEWARE = [
@@ -135,7 +138,16 @@ REST_FRAMEWORK = {
     ],
     'PAGE_SIZE': 5,
 
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ],
+
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
+}
+
+SIMPLE_JWT = {
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 SPECTACULAR_SETTINGS = {

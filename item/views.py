@@ -5,7 +5,7 @@ from rest_framework import viewsets, filters
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from item.models import Category, Item, SubCategory
-from item.serailizers import (CategorySerializer, ItemSerializer,
+from item.serializers import (CategorySerializer, ItemSerializer,
                               SliderSerializer, SubCategorySerializer)
 from .filters import ItemFilter
 
