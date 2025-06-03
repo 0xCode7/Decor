@@ -8,7 +8,7 @@ from item.models import Category, Item, SubCategory
 from item.serializers import (CategorySerializer, ItemSerializer,
                               SliderSerializer, SubCategorySerializer)
 from .filters import ItemFilter
-
+from itertools import chain
 
 def get_filter_backends(self):
     fb = super().get_filter_backends()
@@ -61,9 +61,18 @@ class SliderAPIView(ListAPIView):
     serializer_class = SliderSerializer
 
     def get_queryset(self):
-        ids = Item.objects.values_list('id', flat=True)
-        random_ids = random.sample(list(ids), min(len(ids), 3))
-        return Item.objects.filter(id__in=random_ids)
+        # Get banner item (assuming there's only one)
+        banner_item = Item.objects.filter(name='banner discount slider')
+
+        # Get all item IDs excluding the banner
+        all_ids = Item.objects.exclude(name='banner discount slider').values_list('id', flat=True)
+
+        # Get up to 3 random items excluding banner
+        random_ids = random.sample(list(all_ids), min(len(all_ids), 3))
+        random_items = Item.objects.filter(id__in=random_ids)
+
+        # Combine banner first, then random items
+        return list(chain(banner_item, random_items))
 
 
 class SpecialOfferCategoriesAPIView(ListAPIView):
