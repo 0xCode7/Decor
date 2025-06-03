@@ -42,9 +42,9 @@ class SubCategoryViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = SubCategory.objects.order_by('id')
-        category_id = self.request.query_params.get('category')
+        category_id = self.request.query_params.get('category_id')
         if category_id:
-            queryset = queryset.filter(main_category__id=category_id)
+            queryset = queryset.filter(main_category_id=category_id)
         return queryset
 
 
@@ -66,25 +66,36 @@ class SliderAPIView(ListAPIView):
         return Item.objects.filter(id__in=random_ids)
 
 
-class SpecialOfferAPIView(ListAPIView):
+class SpecialOfferCategoriesAPIView(ListAPIView):
     serializer_class = ItemSerializer
 
     def get_queryset(self):
         items = Item.objects.filter(is_sale=True).order_by('id')
 
-        category_id = self.request.query_params.get('category')
-        if category_id:
-            items = items.filter(category__id=category_id)
+        category_name = self.request.query_params.get('category')
+        if category_name:
+            items = items.filter(category__name__iexact=category_name)
 
         return items
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         subcategories = SubCategory.objects.filter(items__is_sale=True).distinct()
-        items_data = self.serializer_class(queryset, many=True).data
         categories_data = SubCategorySerializer(subcategories, many=True).data
 
         return Response({
-            'categories': categories_data,
-            'items': items_data,
+            'sub-categories': categories_data,
         })
+
+
+class SpecialOfferItemsAPIView(ListAPIView):
+    serializer_class = ItemSerializer
+
+    def get_queryset(self):
+        sub_category_id = self.kwargs.get('sub_category_id')
+        items = Item.objects.filter(is_sale=True)
+
+        if sub_category_id:
+            items = items.filter(category__id=sub_category_id)
+
+        return items
