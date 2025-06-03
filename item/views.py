@@ -32,6 +32,11 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering = ['is_sale']
 
 
+class NewItemsViewSet(ListAPIView):
+    queryset = Item.objects.order_by('-id')[:3]
+    serializer_class = ItemSerializer
+
+
 class SubCategoryViewSet(viewsets.ModelViewSet):
     queryset = SubCategory.objects.order_by('id')
     serializer_class = SubCategorySerializer
@@ -53,3 +58,27 @@ class SliderAPIView(ListAPIView):
         ids = Item.objects.values_list('id', flat=True)
         random_ids = random.sample(list(ids), min(len(ids), 3))
         return Item.objects.filter(id__in=random_ids)
+
+
+class SpecialOfferAPIView(ListAPIView):
+    serializer_class = ItemSerializer
+
+    def get_queryset(self):
+        items = Item.objects.filter(is_sale=True).order_by('id')
+
+        category_name = self.request.query_params.get('category')
+        if category_name:
+            items = items.filter(category__name__iexact=category_name)
+
+        return items
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        subcategories = SubCategory.objects.filter(items__is_sale=True).distinct()
+        items_data = self.serializer_class(queryset, many=True).data
+        categories_data = CategorySerializer(subcategories, many=True).data
+
+        return Response({
+            'categories': categories_data,
+            'items': items_data,
+        })

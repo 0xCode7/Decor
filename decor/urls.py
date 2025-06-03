@@ -5,7 +5,7 @@ from django.views.static import serve
 from django.urls import re_path
 from rest_framework import routers
 from decor import settings
-from item.views import ItemViewSet, CategoryViewSet, SubCategoryViewSet, BestSellerAPIView, SliderAPIView
+from item.views import ItemViewSet, CategoryViewSet, SubCategoryViewSet
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
@@ -19,10 +19,9 @@ router.register('sub-categories', SubCategoryViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
+    path('', include('item.urls')),
     path('', include('authentication.urls')),
     path('schema/', include('decor.schema_urls')),
-    path('best-seller/', BestSellerAPIView.as_view(), name='best-seller-list'),
-    path('slider/', SliderAPIView.as_view(), name='slider-list'),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 
 ]
