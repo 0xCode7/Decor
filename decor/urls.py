@@ -13,7 +13,7 @@ router = routers.DefaultRouter()
 
 router.register('items', ItemViewSet)
 router.register('categories', CategoryViewSet)
-router.register('sub-categories', SubCategoryViewSet)
+router.register('sub-categories', SubCategoryViewSet, basename='sub-categories')
 # router.register('auth', )
 
 urlpatterns = [

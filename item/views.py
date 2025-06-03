@@ -38,8 +38,14 @@ class NewItemsViewSet(ListAPIView):
 
 
 class SubCategoryViewSet(viewsets.ModelViewSet):
-    queryset = SubCategory.objects.order_by('id')
     serializer_class = SubCategorySerializer
+
+    def get_queryset(self):
+        queryset = SubCategory.objects.order_by('id')
+        category_id = self.request.query_params.get('category')
+        if category_id:
+            queryset = queryset.filter(main_category__id=category_id)
+        return queryset
 
 
 class BestSellerAPIView(ListAPIView):
@@ -66,9 +72,9 @@ class SpecialOfferAPIView(ListAPIView):
     def get_queryset(self):
         items = Item.objects.filter(is_sale=True).order_by('id')
 
-        category_name = self.request.query_params.get('category')
-        if category_name:
-            items = items.filter(category__name__iexact=category_name)
+        category_id = self.request.query_params.get('category')
+        if category_id:
+            items = items.filter(category__id=category_id)
 
         return items
 
@@ -76,7 +82,7 @@ class SpecialOfferAPIView(ListAPIView):
         queryset = self.get_queryset()
         subcategories = SubCategory.objects.filter(items__is_sale=True).distinct()
         items_data = self.serializer_class(queryset, many=True).data
-        categories_data = CategorySerializer(subcategories, many=True).data
+        categories_data = SubCategorySerializer(subcategories, many=True).data
 
         return Response({
             'categories': categories_data,
