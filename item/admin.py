@@ -5,8 +5,8 @@ from .models import Item, Category, SubCategory
 # Register your models here.
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'price', 'category')
-    list_filter = ['category']
+    list_display = ('id', 'name', 'price', 'sub_category_id')
+    list_filter = ['sub_category_id']
 
 
 @admin.register(Category)
