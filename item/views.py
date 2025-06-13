@@ -5,6 +5,7 @@ from rest_framework import viewsets, filters
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from item.models import Category, Item, SubCategory, Color
 from item.serializers import (CategorySerializer, ItemSerializer,
                               SliderSerializer, SubCategorySerializer, ColorSerializer)
@@ -29,10 +30,6 @@ class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     filterset_class = ItemFilter
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-
-    def get_search_fields(self, view, request):
-        return [field.name for field in self.get_serializer().Meta.model._meta.fields
-                if isinstance(field, (models.CharField, models.TextField))]
 
     ordering_fields = ['is_sale', 'price']
     ordering = ['is_sale']
@@ -118,3 +115,31 @@ class SearchOptionsAPIView(APIView):
             'sub_categories': SubCategorySerializer(sub_categories, many=True).data,
             'colors': ColorSerializer(colors, many=True).data
         })
+
+    def post(self, request):
+
+        sub_category_id = request.data.get('sub_category_id')
+        color_id = request.data.get('color_id')
+        min_price = request.data.get('min_price')
+        max_price = request.data.get('max_price')
+
+        items = Item.objects.all()
+
+        if sub_category_id:
+            items = items.filter(sub_category_id=sub_category_id)
+
+        if color_id:
+            items = items.filter(color_id=color_id)
+
+        if min_price is not None:
+            items = items.filter(price__gte=min_price)
+
+        if max_price is not None:
+            items = items.filter(price__lte=max_price)
+
+        serialized_items = ItemSerializer(items, many=True).data
+
+        return Response({
+            'items': serialized_items,
+            'count': len(serialized_items)
+        }, status=status.HTTP_200_OK)

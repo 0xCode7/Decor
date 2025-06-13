@@ -29,6 +29,9 @@ class Color(models.Model):
     name = models.CharField(max_length=50, default='Red')
     hex = models.CharField(max_length=7)
 
+    def __str__(self):
+        return self.name
+
 
 class Item(models.Model):
     name = models.CharField(max_length=100)
