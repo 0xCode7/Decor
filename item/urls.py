@@ -3,7 +3,7 @@ from .views import (
     NewItemsViewSet,
     BestSellerAPIView,
     SliderAPIView,
-    SpecialOfferAPIView, SearchOptionsAPIView
+    SpecialOfferAPIView, SearchAPIView, APISettingsAPIView
 )
 
 urlpatterns = [
@@ -11,5 +11,6 @@ urlpatterns = [
     path('best-seller/', BestSellerAPIView.as_view(), name='best-seller-list'),
     path('slider/', SliderAPIView.as_view(), name='slider-list'),
     path('offers/', SpecialOfferAPIView.as_view(), name='special-offer'),
-    path('search/', SearchOptionsAPIView.as_view(), name='search'),
+    path('api-settings/', APISettingsAPIView.as_view(), name='api-settings'),
+    path('search/', SearchAPIView.as_view(), name='search'),
 ]

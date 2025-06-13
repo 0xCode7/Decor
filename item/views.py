@@ -101,7 +101,7 @@ class SpecialOfferAPIView(APIView):
         })
 
 
-class SearchOptionsAPIView(APIView):
+class APISettingsAPIView(APIView):
     def get(self, request):
         price_range = Item.objects.aggregate(
             min_price=Min('price'),
@@ -115,6 +115,9 @@ class SearchOptionsAPIView(APIView):
             'sub_categories': SubCategorySerializer(sub_categories, many=True).data,
             'colors': ColorSerializer(colors, many=True).data
         })
+
+
+class SearchAPIView(APIView):
 
     def post(self, request):
 
