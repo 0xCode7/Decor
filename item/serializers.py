@@ -1,11 +1,15 @@
-from .models import Item, Category, SubCategory
+from .models import Item, Category, SubCategory, Color
 from rest_framework import serializers
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(
+    sub_category_id = serializers.SlugRelatedField(
         read_only=True,
         slug_field='name'
+    )
+    color = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='hex'
     )
 
     class Meta:
@@ -29,3 +33,9 @@ class SliderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id', 'image']
+
+
+class ColorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Color
+        fields = '__all__'

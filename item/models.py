@@ -24,15 +24,22 @@ class SubCategory(models.Model):
         verbose_name_plural = 'Sub Categories'
 
 
+# models.py
+class Color(models.Model):
+    name = models.CharField(max_length=50, default='Red')
+    hex = models.CharField(max_length=7)
+
+
 class Item(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     price = models.FloatField()
     is_sale = models.BooleanField(default=False)
     sale_price = models.FloatField(blank=True, null=True)
-    color = models.CharField(max_length=100)
+    color = models.ForeignKey('Color', on_delete=models.CASCADE, related_name='items')
     image = models.ImageField(upload_to='images', null=True, blank=True)
-    sub_category_id = models.ForeignKey('SubCategory', on_delete=models.CASCADE, null=True, blank=True, related_name='items')
+    sub_category_id = models.ForeignKey('SubCategory', on_delete=models.CASCADE, null=True, blank=True,
+                                        related_name='items')
     rate = models.FloatField(default=0.0)
 
     def __str__(self):

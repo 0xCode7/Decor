@@ -1,14 +1,16 @@
 import random
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Max
+from django.db.models import Min, Max
 from rest_framework import viewsets, filters
 from rest_framework.generics import ListAPIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from item.models import Category, Item, SubCategory
+from item.models import Category, Item, SubCategory, Color
 from item.serializers import (CategorySerializer, ItemSerializer,
-                              SliderSerializer, SubCategorySerializer)
+                              SliderSerializer, SubCategorySerializer, ColorSerializer)
 from .filters import ItemFilter
 from itertools import chain
+
 
 def get_filter_backends(self):
     fb = super().get_filter_backends()
@@ -27,7 +29,11 @@ class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     filterset_class = ItemFilter
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name']
+
+    def get_search_fields(self, view, request):
+        return [field.name for field in self.get_serializer().Meta.model._meta.fields
+                if isinstance(field, (models.CharField, models.TextField))]
+
     ordering_fields = ['is_sale', 'price']
     ordering = ['is_sale']
 
@@ -42,9 +48,9 @@ class SubCategoryViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = SubCategory.objects.order_by('id')
-        category_id = self.request.query_params.get('category_id')
-        if category_id:
-            queryset = queryset.filter(main_category_id=category_id)
+        main_category_id = self.request.query_params.get('main_category_id')
+        if main_category_id:
+            queryset = queryset.filter(main_category_id=main_category_id)
         return queryset
 
 
@@ -75,36 +81,40 @@ class SliderAPIView(ListAPIView):
         return list(chain(banner_item, random_items))
 
 
-class SpecialOfferCategoriesAPIView(ListAPIView):
+class SpecialOfferAPIView(APIView):
     serializer_class = ItemSerializer
 
-    def get_queryset(self):
-        items = Item.objects.filter(is_sale=True).order_by('id')
+    def get(self, request):
+        sub_category_id = request.query_params.get('sub_category_id')
 
-        category_name = self.request.query_params.get('category')
-        if category_name:
-            items = items.filter(category__name__iexact=category_name)
+        # All Sub Category With Special Offers
+        sub_categories = SubCategory.objects.filter(items__is_sale=True).distinct()
+        sub_categories_data = SubCategorySerializer(sub_categories, many=True).data
 
-        return items
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        subcategories = SubCategory.objects.filter(items__is_sale=True).distinct()
-        categories_data = SubCategorySerializer(subcategories, many=True).data
-
+        if not sub_category_id:
+            return Response({
+                'sub-categories': sub_categories_data
+            })
+        items = Item.objects.filter(is_sale=True, sub_category_id=sub_category_id).order_by('id')
+        items_data = ItemSerializer(items, many=True).data
         return Response({
-            'sub-categories': categories_data,
+            'items': items_data,
+            'sub-categories': sub_categories_data,
+
         })
 
 
-class SpecialOfferItemsAPIView(ListAPIView):
-    serializer_class = ItemSerializer
+class SearchOptionsAPIView(APIView):
+    def get(self, request):
+        price_range = Item.objects.aggregate(
+            min_price=Min('price'),
+            max_price=Max('price')
+        )
+        sub_categories = SubCategory.objects.filter(items__isnull=False).distinct()
+        colors = Color.objects.filter(items__isnull=False).distinct()
 
-    def get_queryset(self):
-        sub_category_id = self.kwargs.get('sub_category_id')
-        items = Item.objects.filter(is_sale=True)
-
-        if sub_category_id:
-            items = items.filter(category__id=sub_category_id)
-
-        return items
+        return Response({
+            'price_range': price_range,
+            'sub_categories': SubCategorySerializer(sub_categories, many=True).data,
+            'colors': ColorSerializer(colors, many=True).data
+        })
