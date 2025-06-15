@@ -127,7 +127,7 @@ class APISettingsAPIView(APIView):
             'price_range': price_range,
             'sub_categories': SubCategorySerializer(sub_categories, many=True).data,
             'colors': ColorSerializer(colors, many=True).data,
-            'banner_item': ItemSerializer(banner_item).data
+            'banner_id': banner_item.id
         })
 
 
