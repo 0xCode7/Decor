@@ -22,10 +22,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-6tlo0*oy9_yl6w*!2jgfbr92&!4n3brjz#vm36frm9gvh!z=qq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'decor.up.railway.app']
 CSRF_COOKIE_SECURE = ['127.0.0.', 'https://decor.up.railway.app/']
+CSRF_TRUSTED_ORIGINS = ['https://decor.up.railway.app']
 
 # Application definition
 

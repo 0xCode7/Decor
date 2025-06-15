@@ -16,6 +16,7 @@ class Category(models.Model):
 class SubCategory(models.Model):
     name = models.CharField(max_length=100)
     main_category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
+    icon = models.ImageField(upload_to='icons', null=True, blank=True)
 
     def __str__(self):
         return self.name

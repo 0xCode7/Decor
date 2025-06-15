@@ -5,8 +5,9 @@ from .models import Item, Category, SubCategory, Color
 # Register your models here.
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'price', 'sub_category_id')
+    list_display = ('id', 'name', 'price', 'sub_category_id', 'is_sale', 'sale_price')
     list_filter = ['sub_category_id']
+    ordering = ['sale_price']
 
 
 @admin.register(Category)
