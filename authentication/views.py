@@ -42,22 +42,21 @@ class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
 
-        try:
-            serializer.is_valid(raise_exception=True)
-        except serializers.ValidationError as e:
-            return Response({'errors': e.detail}, status=status.HTTP_400_BAD_REQUEST)
-
+        # Validate credentials
+        serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        refresh_token = RefreshToken.for_user(user)
-        access_token = refresh_token.access_token
+
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        access = refresh.access_token
 
         return Response({
             "user": {
                 "username": user.username,
                 "email": user.email
             },
-            'access_token': str(access_token),
-            "refresh_token": str(refresh_token)
+            'access_token': str(access),
+            "refresh_token": str(refresh)
         }, status=status.HTTP_200_OK)
 
 
