@@ -25,6 +25,7 @@ def cart_detail(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def cart_add(request):
     product_id = request.data.get('product_id')
     quantity = request.data.get('quantity')
@@ -45,6 +46,7 @@ def cart_add(request):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def cart_update(request):
     product_id = request.data.get('product_id')
     quantity = request.data.get('quantity')
@@ -63,6 +65,7 @@ def cart_update(request):
 
 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def cart_delete(request):
     product_id = request.data.get('product_id')
 
@@ -75,6 +78,7 @@ def cart_delete(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def cart_clear(request):
     cart = Cart(request)
     cart.clear()
