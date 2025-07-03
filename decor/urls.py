@@ -21,7 +21,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('', include('item.urls')),
     path('', include('authentication.urls')),
-    path('', include('cart.urls')),
+    path('cart/', include('cart.urls')),
+    path('favorites/', include('favorites.urls')),
     path('schema/', include('decor.schema_urls')),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 
