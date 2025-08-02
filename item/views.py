@@ -1,6 +1,5 @@
 import random
-from email.policy import default
-
+from datetime import datetime
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Min, Max, Case, F, FloatField, Q, When
 from rest_framework import viewsets, filters
@@ -11,6 +10,7 @@ from rest_framework import status
 from item.models import Category, Item, SubCategory, Color
 from item.serializers import (CategorySerializer, ItemSerializer,
                               SliderSerializer, SubCategorySerializer, ColorSerializer)
+from rest_framework_simplejwt.tokens import AccessToken
 from .filters import ItemFilter
 from itertools import chain
 
@@ -122,12 +122,23 @@ class APISettingsAPIView(APIView):
         sub_categories = SubCategory.objects.filter(items__isnull=False).distinct()
         colors = Color.objects.filter(items__isnull=False).distinct()
         banner_item = Item.objects.filter(name='Banner').first()
-
+        auth_header = request.META.get('HTTP_AUTHORIZATION', None)
+        expires_in = ''
+        if auth_header and auth_header.startswith('Bearer '):
+            token_str = auth_header.split(' ')[1]
+            try:
+                token = AccessToken(token_str)
+                expires_timestamp = token['exp']
+                expires_in = datetime.fromtimestamp(expires_timestamp).date()
+                print(expires_in)
+            except Exception as e:
+                print("Invalid token:", str(e))
         return Response({
             'price_range': price_range,
             'sub_categories': SubCategorySerializer(sub_categories, many=True).data,
             'colors': ColorSerializer(colors, many=True).data,
-            'banner_id': banner_item.id
+            'banner_id': banner_item.id,
+            'token_expires_in': expires_in,
         })
 
 

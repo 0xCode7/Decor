@@ -1,7 +1,6 @@
 from logging import raiseExceptions
 
 from rest_framework.views import APIView
-
 from .serializer import RegisterSerializer, LoginSerializer
 from django.shortcuts import render
 from django.contrib.auth.models import User
