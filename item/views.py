@@ -123,14 +123,16 @@ class APISettingsAPIView(APIView):
         colors = Color.objects.filter(items__isnull=False).distinct()
         banner_item = Item.objects.filter(name='Banner').first()
         auth_header = request.META.get('HTTP_AUTHORIZATION', None)
-        expires_in = ''
+        remaining_days = ''
         if auth_header and auth_header.startswith('Bearer '):
             token_str = auth_header.split(' ')[1]
             try:
                 token = AccessToken(token_str)
                 expires_timestamp = token['exp']
-                expires_in = datetime.fromtimestamp(expires_timestamp).date()
-                print(expires_in)
+                expires_date = datetime.fromtimestamp(expires_timestamp).date()
+                today = datetime.now().date()
+
+                remaining_days = (expires_date - today).days
             except Exception as e:
                 print("Invalid token:", str(e))
         return Response({
@@ -138,7 +140,7 @@ class APISettingsAPIView(APIView):
             'sub_categories': SubCategorySerializer(sub_categories, many=True).data,
             'colors': ColorSerializer(colors, many=True).data,
             'banner_id': banner_item.id,
-            'token_expires_in': expires_in,
+            'token_remaining_days': remaining_days,
         })
 
 
