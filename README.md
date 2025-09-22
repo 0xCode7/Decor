@@ -18,7 +18,6 @@ Decor is a web app that helps users visualize and manage décor items: create, c
 ## 🧰 Tech Stack
 
 - Backend: Python / Django  
-- Frontend: JavaScript / HTML / CSS  
 - Database: SQLite (for development)  
 - Deployment: (Add if you’re using Heroku / AWS / etc.)  
 - Other tools / libs: requirements specified in `requirements.txt`  
