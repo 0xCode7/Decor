@@ -102,4 +102,4 @@ Built by **0xCode7** (Mahmoud Said).
 📧 Email: mahmoudsaid1704@gmail.com  
 📱 Phone: +201030455138  
 
-Passionate about full-stack dev.  
+Passionate about Backend dev.  
